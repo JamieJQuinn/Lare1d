@@ -2,6 +2,7 @@
 
 #include "Precision.hpp"
 #include <cstdio>
+#include <iostream>
 
 class Variable {
   // Encapsulates an array representing a variable in the model
@@ -12,10 +13,14 @@ class Variable {
     real * getPlus(int nSteps);
     int readFromFile(FILE* fp);
     int writeToFile(FILE* fp) const;
-    // totalSteps gives the number of arrays to store, including the current one
-    Variable(int inLength);
-    Variable(int inLength, int inTotalSteps);
     int len() const;
+    real operator[](const int i) const;
+    void printTo(std::ostream& stream) const;
+
+    Variable(int inLength);
+    // totalSteps gives the number of arrays to store, including the current one
+    Variable(int inLength, int inTotalSteps);
+    ~Variable();
     
   private:
     real * data;

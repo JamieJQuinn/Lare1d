@@ -1,11 +1,12 @@
 #include "Variable.hpp"
 #include "Precision.hpp"
+#include <iostream>
 
-real* Variable::get() {
+inline real* Variable::get() {
   return getPlus(0);
 }
 
-real* Variable::getPlus(int nSteps) {
+inline real* Variable::getPlus(int nSteps) {
   return data + (current+nSteps)%totalSteps;
 }
 
@@ -31,8 +32,19 @@ int Variable::writeToFile(FILE* fp) const {
   }
 }
 
-int Variable::len() const {
+inline int Variable::len() const {
   return this->length;
+}
+
+void Variable::printTo(std::ostream& stream) const {
+  for(int i = 0; i < len(); ++i) {
+    stream << (*this)[i] << ", ";
+  }
+  stream << std::endl;
+}
+
+inline real Variable::operator[](const int i) const {
+  return data[current * len() + i];
 }
 
 Variable::Variable(int inLength) {
@@ -45,3 +57,7 @@ Variable::Variable(int inLength, int inTotalSteps):
   totalSteps(inTotalSteps),
   current(0)
 {}
+
+Variable::~Variable() {
+  delete [] data;
+}
