@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-c -Wall -std=c++11
 LDFLAGS=
-SOURCES=main.cpp ModelVariables.cpp FluxLimiter.cpp Variable.cpp
+SOURCES=main.cpp ModelVariables.cpp FluxLimiter.cpp Variable.cpp Constants.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 	EXECUTABLE=lare1d
 
