@@ -6,9 +6,9 @@ class Constants {
   public:
     real dt;
     real gamma;
-    real nGridPoints;
+    int nGridPoints;
     real sigma1;
     real sigma2;
 
-    Constants(real dtIn, real gammaIn, real nGridPointsIn, real sigma1In, real sigma2In);
+    Constants(real dtIn, real gammaIn, int nGridPointsIn, real sigma1In, real sigma2In);
 };
