@@ -21,7 +21,7 @@ ModelVariables::ModelVariables(int length):
   vars.push_back(&dM);
 }
 
-inline int ModelVariables::len() const {
+int ModelVariables::len() const {
   return this->length;
 }
 
