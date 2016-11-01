@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=main.cpp
+SOURCES=main.cpp Variables.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 	EXECUTABLE=lare1d
 
@@ -14,4 +14,4 @@ $(EXECUTABLE): $(OBJECTS)
 	    $(CC) $(CFLAGS) $< -o $@
 
 clean:
-			rm *.o $(EXECUTABLE)
+			rm $(OBJECTS) $(EXECUTABLE)
