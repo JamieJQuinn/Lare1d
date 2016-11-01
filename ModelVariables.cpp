@@ -30,8 +30,8 @@ int ModelVariables::load(const std::string filePath) {
 
   if( inFile == NULL ) { return -1; }
 
-  for(auto var = vars.begin(); var != vars.end(); ++var) {
-    (*var)->writeToFile(inFile);
+  for(auto var : vars) {
+    var->writeToFile(inFile);
   }
 
   fclose(inFile);
@@ -44,8 +44,8 @@ int ModelVariables::save(const std::string filePath) const {
 
   if( outFile == NULL ) { return -1; }
 
-  for(auto var = vars.begin(); var != vars.end(); ++var) {
-    (*var)->readFromFile(outFile);
+  for(auto var : vars) {
+    var->readFromFile(outFile);
   }
 
   fclose(outFile);
