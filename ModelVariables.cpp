@@ -21,7 +21,7 @@ ModelVariables::ModelVariables(int length):
   vars.push_back(&dM);
 }
 
-int ModelVariables::len() const {
+inline int ModelVariables::len() const {
   return this->length;
 }
 
@@ -31,7 +31,7 @@ int ModelVariables::load(const std::string filePath) {
   if( inFile == NULL ) { return -1; }
 
   for(auto var : vars) {
-    var->writeToFile(inFile);
+    var->readFromFile(inFile);
   }
 
   fclose(inFile);
@@ -45,7 +45,7 @@ int ModelVariables::save(const std::string filePath) const {
   if( outFile == NULL ) { return -1; }
 
   for(auto var : vars) {
-    var->readFromFile(outFile);
+    var->writeToFile(outFile);
   }
 
   fclose(outFile);
