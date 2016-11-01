@@ -3,7 +3,7 @@
 
 class FluxLimiter {
   public:
-  real calcAbsLimiterAt(int i, real* phi, real* f, real* u, real* dxc, real* dxb);
+  real calcAt(int i, real* phi, real* f, real* u, real* dxc, real* dxb);
 
   private:
   int sign(real x) {

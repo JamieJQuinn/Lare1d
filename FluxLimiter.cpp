@@ -5,7 +5,7 @@
 using std::abs;
 using std::min;
 
-real FluxLimiter::calcAbsLimiterAt(int i, real* phi, real* f, real* u, real* dxc, real* dxb) {
+real FluxLimiter::calcAt(int i, real* phi, real* f, real* u, real* dxc, real* dxb) {
   real absD = (2-phi[i])/3*abs(f[i+1] - f[i])/dxc[i];
   if(u[i]>0) {
     absD += (1+phi[i])/3*abs(f[i] - f[i-1])/dxc[i-1];
