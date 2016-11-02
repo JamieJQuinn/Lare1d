@@ -15,7 +15,8 @@ class ModelVariables {
              dxc,
              energy,
              dM,
-             de;
+             de,
+             du;
 
     int save(const std::string) const;
     int load(const std::string);

@@ -11,7 +11,8 @@ ModelVariables::ModelVariables(int length):
   dxc(length, 2),
   energy(length, 2),
   dM(length, 1),
-  de(length, 1)
+  de(length, 1),
+  du(length, 1)
 {
   vars.push_back(&density);
   vars.push_back(&pressure);
@@ -21,6 +22,7 @@ ModelVariables::ModelVariables(int length):
   vars.push_back(&energy);
   vars.push_back(&dM);
   vars.push_back(&de);
+  vars.push_back(&du);
 }
 
 int ModelVariables::len() const {
