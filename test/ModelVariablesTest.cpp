@@ -1,7 +1,7 @@
 #include "catch.hpp"
-#include "ModelVariables.hpp"
+#include <ModelVariables.hpp>
 
-TEST_CASE( "Variables save and load correctly", "[variables]" ) {
+TEST_CASE( "ModelVariables save and load correctly", "[variables]" ) {
   ModelVariables vars(10);
 
   real* data = vars.pressure.get();
