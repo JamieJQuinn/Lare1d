@@ -37,6 +37,7 @@ void runCorrectorStep(ModelVariables& vars, const Constants& c) {
   Variable &dxb = vars.dxb;
   real* dxbNew = dxb.getPlus(1);
   Variable &dxc = vars.dxc;
+  real* dxcNew = dxc.getPlus(1);
 
   for(int i=1; i<vars.len() - 1; ++i) {
     // Calc density at spatial half step
@@ -45,6 +46,7 @@ void runCorrectorStep(ModelVariables& vars, const Constants& c) {
     uHalf[i] = (u[i] + uNew[i])/2.0f;
     eNew[i] = e[i] - c.dt*pHalf[i]*(uHalf[i] - uHalf[i-1])/(rho[i]*dxb[i]);
     dxbNew[i] = dxb[i] + c.dt*(uHalf[i] - uHalf[i-1]);
+    dxcNew[i] = dxc[i] + c.dt*(uHalf[i+1] - uHalf[i-1])/2.0f;
     rhoNew[i] = rho[i]*dxb[i]/dxbNew[i];
     pNew[i] = calcNewPressure(eNew[i], c.gamma, rho[i], dxb[i], dxbNew[i]);
   }
@@ -54,18 +56,20 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
   real* rho = vars.density.get();
   real* rhoNew = vars.density.getPlus(1);
   real* dxb = vars.dxb.get();
-  real* dxc = vars.dxc.get();
   real* dxbNew = vars.dxb.getPlus(1);
+  real* dxc = vars.dxc.get();
+  real* dxcNew = vars.dxc.getPlus(1);
   real* uBar = vars.velocity.getPlus(1); // Recall this is the half step velocity
   real* dM = vars.dM.get();
   real* de = vars.de.get();
+  real* e = vars.energy.get();
   real* eNew = vars.energy.getPlus(1);
   
   // Calculate dM and de
   for(int i = 1; i < vars.len(); ++i) {
     real phi = uBar[i]*c.dt/dxbNew[i];
-    real D = FluxLimiter::calcAt(i, phi, rhoNew, uBar[i], dxc, dxb);
-    real dedx = FluxLimiter::calcAt(i, phi, eNew, uBar[i], dxc, dxb);
+    real D = FluxLimiter::calcAt(i, phi, rhoNew, uBar[i], dxcNew, dxbNew);
+    real dedx = FluxLimiter::calcAt(i, phi, e, uBar[i], dxc, dxb);
     dM[i] = (rhoNew[i] + dxbNew[i]/2.0f*D*(i-phi))*uBar[i]*c.dt;
     de[i] = (eNew[i] + dxb[i]/2.0f*dedx*(1 - dM[i]/(rhoNew[i]*dxbNew[i])))*dM[i];
   }
