@@ -69,7 +69,7 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
   real* de = vars.de.get();
   
   // Calculate dM and de
-  for(int i = 1; i < vars.len(); ++i) {
+  for(int i = 1; i < vars.len()-2; ++i) {
     real phi = uBar[i]*c.dt/dxbNew[i];
     real D = FluxLimiter::calcAt(i, phi, rhoNew, uBar[i], dxcNew, dxbNew);
     real dedx = FluxLimiter::calcAt(i, phi, e, uBar[i], dxc, dxb);
@@ -86,6 +86,11 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
     rhoNew[i] = rho[i] + (dM[i-1] - dM[i])/dxb[i];
     eNew[i] = (eNew[i]*dxb[i]*rho[i] + de[i-1] - de[i])/(dxb[i]*rhoNew[i]);
     uNew[i] = (uNew[i]*dxc[i]*rho[i] + du[i-1] - du[i])/(dxc[i]*rhoNew[i]);
+  }
+  // Remap grid
+  for(int i=0; i < vars.len(); ++i) {
+    dxbNew[i] = dxb[i];
+    dxcNew[i] = dxc[i];
   }
 }
 
