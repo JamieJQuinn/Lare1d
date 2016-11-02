@@ -5,8 +5,8 @@
 
 ModelVariables::ModelVariables(int length):
   density(length, 2),
-  pressure(length, 1),
-  velocity(length, 2),
+  pressure(length, 1), // Pressure derived from other variables, only ever need one cache
+  velocity(length, 3),
   dxb(length, 2),
   dxc(length, 2),
   energy(length, 2),
