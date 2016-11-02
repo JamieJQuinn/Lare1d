@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Precision.hpp"
+#include <Precision.hpp>
 #include <cstdio>
 #include <iostream>
 

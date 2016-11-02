@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Precision.hpp"
-#include "Variable.hpp"
+#include <Precision.hpp>
+#include <Variable.hpp>
 #include <cstdio>
 #include <string>
 #include <vector>

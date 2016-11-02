@@ -1,8 +1,8 @@
-#include "ModelVariables.hpp"
-#include "Constants.hpp"
-#include "Variable.hpp"
+#include <ModelVariables.hpp>
+#include <Constants.hpp>
+#include <Variable.hpp>
 #include <iostream>
-#include "RiemannProblem.hpp"
+#include <RiemannProblem.hpp>
 
 int main(int argc, char** argv) {
   const Constants c(0.0001f, 2.0f, 10, 2.0f, 3.0f);
