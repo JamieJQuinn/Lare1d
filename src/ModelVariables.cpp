@@ -23,6 +23,10 @@ ModelVariables::ModelVariables(int length):
   vars.push_back(&dM);
   vars.push_back(&de);
   vars.push_back(&du);
+
+  IO.push_back(&density);
+  IO.push_back(&pressure);
+  IO.push_back(&velocity);
 }
 
 int ModelVariables::len() const {
@@ -35,13 +39,22 @@ void ModelVariables::nextTimestep(int nSteps) {
   }
 }
 
-int ModelVariables::load(const std::string filePath) {
+int ModelVariables::load(const std::string filePath, const Constants c) {
   FILE* inFile = fopen(filePath.c_str(), "rb");
 
   if( inFile == NULL ) { return -1; }
 
-  for(auto var : vars) {
-    var->readFromFile(inFile);
+  for(auto var : IO) {
+    var->readFromFile(inFile, 1);
+  }
+
+  // Calculate other required variables that aren't saved
+  real* e = energy.get();
+  real* dxcArray = dxc.get();
+  real* dxbArray = dxb.get();
+  for(int i=0; i<len(); ++i) {
+    e[i] = pressure[i]/(density[i]*(c.gamma-1));
+    dxcArray[i] = dxbArray[i] = 1.0f/c.nGridPoints;
   }
 
   fclose(inFile);
@@ -54,8 +67,8 @@ int ModelVariables::save(const std::string filePath) const {
 
   if( outFile == NULL ) { return -1; }
 
-  for(auto var : vars) {
-    var->writeToFile(outFile);
+  for(auto var : IO) {
+    var->writeToFile(outFile, 1);
   }
 
   fclose(outFile);
