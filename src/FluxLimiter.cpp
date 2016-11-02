@@ -1,4 +1,5 @@
 #include <FluxLimiter.hpp>
+#include <Precision.hpp>
 #include <cmath>
 #include <algorithm>
 
@@ -22,4 +23,8 @@ int FluxLimiter::calcSignAt(int i, real* f) {
   } else {
     return 0;
   }
+}
+
+int FluxLimiter::sign(real x) {
+    return (x > 0) - (x < 0);
 }
