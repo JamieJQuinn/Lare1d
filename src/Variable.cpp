@@ -10,6 +10,10 @@ real* Variable::getPlus(int nSteps) {
   return data + (current+nSteps)%totalSteps;
 }
 
+void Variable::nextTimestep(int nSteps) {
+  current += nSteps;
+}
+
 int Variable::readFromFile(FILE* fp) {
   int totalLength = len()*totalSteps;
   size_t nItemsRead = std::fread(data, sizeof(real), totalLength, fp);

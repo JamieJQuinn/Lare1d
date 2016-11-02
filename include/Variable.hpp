@@ -16,6 +16,7 @@ class Variable {
     int len() const;
     real operator[](const int i) const;
     void printTo(std::ostream& stream) const;
+    void nextTimestep(int nSteps=0);
 
     Variable(int inLength);
     // totalSteps gives the number of arrays to store, including the current one

@@ -8,11 +8,19 @@
 
 class ModelVariables {
   public:
-    Variable density, pressure, velocity, dxb, dxc, energy, dM;
+    Variable density,
+             pressure,
+             velocity,
+             dxb,
+             dxc,
+             energy,
+             dM,
+             de;
 
     int save(const std::string) const;
     int load(const std::string);
     int len() const;
+    void nextTimestep(int nSteps=1);
 
     ModelVariables(int length);
 

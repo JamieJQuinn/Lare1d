@@ -10,7 +10,8 @@ ModelVariables::ModelVariables(int length):
   dxb(length, 2),
   dxc(length, 2),
   energy(length, 2),
-  dM(length, 1)
+  dM(length, 1),
+  de(length, 1)
 {
   vars.push_back(&density);
   vars.push_back(&pressure);
@@ -19,10 +20,17 @@ ModelVariables::ModelVariables(int length):
   vars.push_back(&dxc);
   vars.push_back(&energy);
   vars.push_back(&dM);
+  vars.push_back(&de);
 }
 
 int ModelVariables::len() const {
   return this->length;
+}
+
+void ModelVariables::nextTimestep(int nSteps) {
+  for(auto var : vars) {
+    var->nextTimestep(nSteps);
+  }
 }
 
 int ModelVariables::load(const std::string filePath) {
