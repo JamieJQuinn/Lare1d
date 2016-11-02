@@ -8,9 +8,11 @@ class Variable {
   // Encapsulates an array representing a variable in the model
   public:
     // get current array
-    real * get();
+    real * get() const;
     // get array representing the variable nSteps steps in the future
-    real * getPlus(int nSteps);
+    real * getPlus(int nSteps) const;
+    int readFromFile(FILE* fp, int nSteps);
+    int writeToFile(FILE* fp, int nSteps) const;
     int readFromFile(FILE* fp);
     int writeToFile(FILE* fp) const;
     int len() const;
