@@ -8,7 +8,7 @@ TEST_CASE( "ModelVariables save and load correctly", "[variables]" ) {
   std::string filePath = "ModelVariableSaveTest.dat";
   std::remove(filePath.c_str());
   const Constants c(0.0001f, 2.0f, N, 10, 2.0f, 3.0f);
-  ModelVariables vars(N);
+  ModelVariables vars(c);
 
   real* data = vars.pressure.get();
   for(int i=0; i<5; ++i) {
@@ -17,7 +17,7 @@ TEST_CASE( "ModelVariables save and load correctly", "[variables]" ) {
 
   vars.save(filePath.c_str());
 
-  ModelVariables vars2(N);
+  ModelVariables vars2(c);
 
   vars2.load(filePath.c_str(), c);
 

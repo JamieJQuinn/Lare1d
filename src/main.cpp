@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
       2.0f,
       3.0f
   );
-  ModelVariables vars(c.nGridPoints);
+  ModelVariables vars(c);
 
   setupInitialConditions(vars, c);
   for(int n=0; n<c.nTimeSteps; ++n) {

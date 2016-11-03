@@ -26,7 +26,7 @@ class ModelVariables {
     void print() const;
     void printTo(std::ostream& stream) const;
 
-    ModelVariables(int length);
+    ModelVariables(const Constants& c);
 
   private:
     // List of all vars
