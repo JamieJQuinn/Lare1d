@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-c -Wall -std=c++11 -I $(INCLUDE_DIR)
+CFLAGS=-c -Wall -std=c++11 -I$(INCLUDE_DIR) -g
 LDFLAGS=
 SRC_DIR=src
 SOURCES=$(wildcard $(SRC_DIR)/*.cpp)
