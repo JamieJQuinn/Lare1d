@@ -12,7 +12,8 @@ ModelVariables::ModelVariables(int length):
   energy(length, 2),
   dM(length, 1),
   de(length, 1),
-  du(length, 1)
+  du(length, 1),
+  length(length)
 {
   vars.push_back(&density);
   vars.push_back(&pressure);
@@ -39,7 +40,7 @@ void ModelVariables::nextTimestep(int nSteps) {
   }
 }
 
-int ModelVariables::load(const std::string filePath, const Constants c) {
+int ModelVariables::load(const std::string& filePath, const Constants& c) {
   FILE* inFile = fopen(filePath.c_str(), "rb");
 
   if( inFile == NULL ) { return -1; }
@@ -62,7 +63,7 @@ int ModelVariables::load(const std::string filePath, const Constants c) {
   return 0;
 }
 
-int ModelVariables::save(const std::string filePath) const {
+int ModelVariables::save(const std::string& filePath) const {
   FILE* outFile = fopen(filePath.c_str(), "wb");
 
   if( outFile == NULL ) { return -1; }

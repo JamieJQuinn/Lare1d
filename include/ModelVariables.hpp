@@ -19,8 +19,8 @@ class ModelVariables {
              de,
              du;
 
-    int save(const std::string) const;
-    int load(const std::string, const Constants c);
+    int save(const std::string& filePath) const;
+    int load(const std::string& filePath, const Constants& c);
     int len() const;
     void nextTimestep(int nSteps=1);
 
