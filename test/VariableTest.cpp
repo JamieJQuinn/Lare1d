@@ -46,10 +46,14 @@ TEST_CASE( "[] operator working correctly" ) {
   int length = 10;
   int steps = 2;
   Variable a(length, steps);
-  
-  real* data = a.getPlus(1);
-  data[3] = 1.0f;
 
+  real* data = a.get();
+  data[3] = 1.0f;
+  CHECK(data[3] == Approx(a[3]));
+  data[3] = 0.0f;
+  
+  data = a.getPlus(1);
+  data[3] = 1.0f;
   a.nextTimestep();
   CHECK(data[3] == Approx(a[3]));
 }
