@@ -13,9 +13,9 @@ def main():
 
     f, axarr = plt.subplots(3, sharex=True)
 
-    axarr[0].plot(density)
-    axarr[1].plot(velocity)
-    axarr[2].plot(pressure)
+    axarr[0].plot(pressure)
+    axarr[1].plot(density)
+    axarr[2].plot(velocity)
 
     plt.show()
 
