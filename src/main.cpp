@@ -4,9 +4,11 @@
 #include <RiemannProblem.hpp>
 #include <FluxLimiter.hpp>
 #include <iostream>
+#include <cmath>
+#include <assert.h>
 
-inline real calcNewPressure(real eNew, real gamma, real rho, real dxb, real dxbNew) {
-  return eNew*(gamma-1)*rho*dxb/dxbNew;
+real calcPressure(real energy, real gamma, real rho) {
+  return energy*(gamma-1)*rho;
 }
 
 void runPredictorStep(ModelVariables& vars, const Constants& c) {
@@ -20,7 +22,7 @@ void runPredictorStep(ModelVariables& vars, const Constants& c) {
   for(int i=1; i<vars.len(); ++i) {
     real energyHalf = e[i] - c.dt/2.0f*p[i]*(u[i] - u[i-1])/(rho[i]*dxb[i]);
     real dxbHalf = dxb[i] + c.dt/2.0f*(u[i] - u[i-1]);
-    pHalf[i] = calcNewPressure(energyHalf, c.gamma, rho[i], dxb[i], dxbHalf);
+    pHalf[i] = calcPressure(energyHalf, c.gamma, rho[i]*dxb[i]/dxbHalf);
   }
 }
 
@@ -48,7 +50,7 @@ void runCorrectorStep(ModelVariables& vars, const Constants& c) {
     dxbNew[i] = dxb[i] + c.dt*(uHalf[i] - uHalf[i-1]);
     dxcNew[i] = dxc[i] + c.dt*(uHalf[i+1] - uHalf[i-1])/2.0f;
     rhoNew[i] = rho[i]*dxb[i]/dxbNew[i];
-    pNew[i] = calcNewPressure(eNew[i], c.gamma, rho[i], dxb[i], dxbNew[i]);
+    pNew[i] = calcPressure(eNew[i], c.gamma, rhoNew[i]);
   }
 }
 
@@ -98,8 +100,8 @@ int main(int argc, char** argv) {
   const Constants c(
       0.0001f,
       2.0f,
-      300,
-      324,
+      10,
+      1,
       2.0f,
       3.0f
   );
@@ -107,9 +109,13 @@ int main(int argc, char** argv) {
 
   setupInitialConditions(vars, c);
   for(int n=0; n<c.nTimeSteps; ++n) {
+    vars.printTo(std::cout);
     runPredictorStep(vars, c);
+    vars.printTo(std::cout);
     runCorrectorStep(vars, c);
+    vars.printTo(std::cout);
     runRemapStep(vars, c);
+    vars.printTo(std::cout);
     vars.nextTimestep();
   }
 
