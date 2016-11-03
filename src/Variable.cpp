@@ -12,6 +12,7 @@ real* Variable::getPlus(int nSteps) const {
 
 void Variable::nextTimestep(int nSteps) {
   current += nSteps;
+  current %= totalSteps;
 }
 
 int Variable::readFromFile(FILE* fp, int nSteps) {
