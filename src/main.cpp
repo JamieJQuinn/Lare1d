@@ -95,10 +95,25 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
 }
 
 int main(int argc, char** argv) {
-  const Constants c(0.0001f, 2.0f, 10, 2.0f, 3.0f);
+  const Constants c(
+      0.0001f,
+      2.0f,
+      300,
+      324,
+      2.0f,
+      3.0f
+  );
   ModelVariables vars(c.nGridPoints);
 
   setupInitialConditions(vars, c);
+  for(int n=0; n<c.nTimeSteps; ++n) {
+    runPredictorStep(vars, c);
+    runCorrectorStep(vars, c);
+    runRemapStep(vars, c);
+    vars.nextTimestep();
+  }
+
+  vars.save("RiemannSoln0.0324.dat");
 
   return 0;
 }
