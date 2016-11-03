@@ -7,7 +7,7 @@ real* Variable::get() const {
 }
 
 real* Variable::getPlus(int nSteps) const {
-  return data + (current+nSteps)%totalSteps;
+  return data + ((current+nSteps)%totalSteps)*len();
 }
 
 void Variable::nextTimestep(int nSteps) {
