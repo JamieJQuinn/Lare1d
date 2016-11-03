@@ -23,6 +23,8 @@ class ModelVariables {
     int load(const std::string& filePath, const Constants& c);
     int len() const;
     void nextTimestep(int nSteps=1);
+    void print() const;
+    void printTo(std::ostream& stream) const;
 
     ModelVariables(int length);
 

@@ -1,5 +1,6 @@
 #include <ModelVariables.hpp>
 #include <Precision.hpp>
+#include <iostream>
 #include <cstdio>
 #include <string>
 
@@ -15,8 +16,14 @@ ModelVariables::ModelVariables(int length):
   du(length, 1),
   length(length)
 {
-  vars.push_back(&density);
+  real* dxcData = dxc.get();
+  real* dxbData = dxb.get();
+  for(int i=0; i<length; ++i) {
+    dxcData[i] = dxbData[i] = 1.0f/real(length);
+  }
+
   vars.push_back(&pressure);
+  vars.push_back(&density);
   vars.push_back(&velocity);
   vars.push_back(&dxb);
   vars.push_back(&dxc);
@@ -37,6 +44,16 @@ int ModelVariables::len() const {
 void ModelVariables::nextTimestep(int nSteps) {
   for(auto var : vars) {
     var->nextTimestep(nSteps);
+  }
+}
+
+void ModelVariables::print() const {
+  printTo(std::cout);
+}
+
+void ModelVariables::printTo(std::ostream& stream) const {
+  for(auto var : vars) {
+    var->printTo(stream);
   }
 }
 
