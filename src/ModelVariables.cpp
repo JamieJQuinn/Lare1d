@@ -19,7 +19,7 @@ ModelVariables::ModelVariables(const Constants& c):
   // Initialise grid and energy
   real* dxcData = dxc.get();
   real* dxbData = dxb.get();
-  for(int i=0; i<c.nGridPoints; ++i) {
+  for(int i=0; i<c.nGridPoints*2; ++i) {
     dxcData[i] = dxbData[i] = 1.0f/real(c.nGridPoints);
   }
 

@@ -77,7 +77,7 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
     real dedx = FluxLimiter::calcAt(i, phi, e, uBar[i], dxc, dxb);
     // NB: dudx calc'd over dxc, hence swap dxc & dxb
     real dudx = FluxLimiter::calcAt(i, phi, u, uBar[i], dxb, dxc);
-    dM[i] = (rhoNew[i] + dxbNew[i]/2.0f*D*(i-phi))*uBar[i]*c.dt;
+    dM[i] = (rhoNew[i] + dxbNew[i]/2.0f*D*(1-phi))*uBar[i]*c.dt;
     de[i] = (eNew[i] + dxb[i]/2.0f*dedx*(1 - dM[i]/(rho[i]*dxb[i])))*dM[i];
     du[i] = (uNew[i] + dxc[i]/2.0f*dudx*(1 - dM[i]/(rho[i]*dxc[i])))*dM[i];
   }
@@ -100,8 +100,8 @@ int main(int argc, char** argv) {
   const Constants c(
       0.0001f,
       2.0f,
-      10,
-      1,
+      300,
+      324,
       2.0f,
       3.0f
   );
@@ -109,13 +109,9 @@ int main(int argc, char** argv) {
 
   setupInitialConditions(vars, c);
   for(int n=0; n<c.nTimeSteps; ++n) {
-    vars.printTo(std::cout);
     runPredictorStep(vars, c);
-    vars.printTo(std::cout);
     runCorrectorStep(vars, c);
-    vars.printTo(std::cout);
     runRemapStep(vars, c);
-    vars.printTo(std::cout);
     vars.nextTimestep();
   }
 
