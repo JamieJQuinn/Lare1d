@@ -3,3 +3,4 @@ lare1d
 .ycm_extra_conf.py
 *.dat
 test/test_lare1d
+data
