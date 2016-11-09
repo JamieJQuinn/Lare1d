@@ -27,3 +27,12 @@ TEST_CASE( "ModelVariables save and load correctly", "[variables]" ) {
     CHECK(vars.velocity[i] == vars2.velocity[i]);
   }
 }
+
+TEST_CASE( "ModelVariables contain correct length" ) {
+  int length = 10;
+  const Constants c(0.0001f, 2.0f, length, 10, 2.0f, 3.0f);
+  ModelVariables vars(c);
+
+  CHECK(vars.len() == length);
+  CHECK(vars.density.len() == length);
+}

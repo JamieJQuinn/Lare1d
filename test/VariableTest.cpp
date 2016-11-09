@@ -57,3 +57,15 @@ TEST_CASE( "[] operator working correctly" ) {
   a.nextTimestep();
   CHECK(data[3] == Approx(a[3]));
 }
+
+TEST_CASE( "nextTimestep working fine") {
+  int length = 10;
+  int steps = 2;
+  Variable a(length, steps);
+
+  real* data = a.get();
+
+  a.nextTimestep();
+
+  CHECK(data+length == a.get());
+}
