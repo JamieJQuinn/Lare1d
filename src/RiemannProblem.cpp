@@ -9,6 +9,7 @@ void setupInitialConditions(ModelVariables &vars, const Constants &c) {
   real *density = vars.density.get();
   real *velocity = vars.velocity.get();
   real *energy = vars.energy.get();
+
   for(int i = 0; i < c.nGridPoints*0.5f; ++i) {
     pressure[i] = 128.0f;
     density[i] = 256.0f/49.0f;
@@ -25,7 +26,8 @@ void setupInitialConditions(ModelVariables &vars, const Constants &c) {
   }
 }
 
-void setupAnalyticalSolution(ModelVariables &vars, const Constants &c, real t) {
+void setupAnalyticalSolution(ModelVariables &vars, const Constants &c) {
+  real t = c.dt*c.nTimeSteps;
   real *pressure = vars.pressure.get();
   real *density = vars.density.get();
   real *velocity = vars.velocity.get();
