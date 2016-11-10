@@ -17,6 +17,7 @@ class Variable {
     int writeToFile(FILE* fp) const;
     int len() const;
     real operator[](const int i) const;
+    void print() const;
     void printTo(std::ostream& stream) const;
     void nextTimestep(int nSteps=1);
 

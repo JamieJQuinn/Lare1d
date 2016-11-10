@@ -59,6 +59,10 @@ int Variable::len() const {
   return this->length;
 }
 
+void Variable::print() const {
+  printTo(std::cout);
+}
+
 void Variable::printTo(std::ostream& stream) const {
   for(int i = 0; i < len(); ++i) {
     stream << (*this)[i] << ", ";
@@ -75,7 +79,7 @@ Variable::Variable(int inLength) {
 }
 
 Variable::Variable(int inLength, int inTotalSteps):
-  data(new real[inLength*inTotalSteps]),
+  data(new real[inLength*inTotalSteps]()),
   length(inLength),
   totalSteps(inTotalSteps),
   current(0)
