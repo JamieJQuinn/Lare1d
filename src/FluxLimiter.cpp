@@ -6,18 +6,18 @@
 using std::abs;
 using std::min;
 
-real FluxLimiter::calcAt(int i, real phi, real* f, real uBar, real* dxc, real* dxb) {
-  real absD = (2.0f-phi)/3.0f*abs(f[i+1] - f[i])/dxc[i];
+real FluxLimiter::calcAt(int i, real phi, real* f, real uBar, real* dxCell, real* dxBound) {
+  real absD = (2.0f-phi)/3.0f*abs(f[i+1] - f[i])/dxCell[i];
   if(uBar>0.0f) {
-    absD += (1.0f+phi)/3.0f*abs(f[i] - f[i-1])/dxc[i-1];
+    absD += (1.0f+phi)/3.0f*abs(f[i] - f[i-1])/dxCell[i-1];
   } else {
-    absD += (1.0f+phi)/3.0f*abs(f[i+2] - f[i+1])/dxc[i+1];
+    absD += (1.0f+phi)/3.0f*abs(f[i+2] - f[i+1])/dxCell[i+1];
   }
   real dfMin = 2*min(abs(f[i+1] - f[i]), abs(f[i] - f[i-1]));
   real s = calcSignAt(i, f);
 
   //return s*absD;
-  return s*min(absD*dxb[i], dfMin);
+  return s*min(absD*dxBound[i], dfMin);
 }
 
 int FluxLimiter::calcSignAt(int i, real* f) {

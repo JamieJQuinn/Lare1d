@@ -8,23 +8,23 @@ ModelVariables::ModelVariables(const Constants& c):
   density(c.nGridPoints, 2),
   pressure(c.nGridPoints, 1), // Pressure derived from other variables, only ever need one cache
   velocity(c.nGridPoints, 3),
-  dxb(c.nGridPoints, 2),
-  dxc(c.nGridPoints, 2),
+  dxBound(c.nGridPoints, 2),
+  dxCell(c.nGridPoints, 2),
   energy(c.nGridPoints, 2),
   length(c.nGridPoints)
 {
   // Initialise grid and energy
-  real* dxcData = dxc.get();
-  real* dxbData = dxb.get();
+  real* dxCellData = dxCell.get();
+  real* dxBoundData = dxBound.get();
   for(int i=0; i<c.nGridPoints*2; ++i) {
-    dxcData[i] = dxbData[i] = 1.0f/real(c.nGridPoints);
+    dxCellData[i] = dxBoundData[i] = 1.0f/real(c.nGridPoints);
   }
 
   vars.push_back(&pressure);
   vars.push_back(&density);
   vars.push_back(&velocity);
-  vars.push_back(&dxb);
-  vars.push_back(&dxc);
+  vars.push_back(&dxBound);
+  vars.push_back(&dxCell);
   vars.push_back(&energy);
 
   IO.push_back(&density);
@@ -63,11 +63,11 @@ int ModelVariables::load(const std::string& filePath, const Constants& c) {
 
   // Calculate other required variables that aren't saved
   real* e = energy.get();
-  real* dxcData = dxc.get();
-  real* dxbData = dxb.get();
+  real* dxCellData = dxCell.get();
+  real* dxBoundData = dxBound.get();
   for(int i=0; i<len(); ++i) {
     e[i] = pressure[i]/(density[i]*(c.gamma-1));
-    dxcData[i] = dxbData[i] = 1.0f/c.nGridPoints;
+    dxCellData[i] = dxBoundData[i] = 1.0f/c.nGridPoints;
   }
 
   fclose(inFile);

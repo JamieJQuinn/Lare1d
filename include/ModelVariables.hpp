@@ -12,8 +12,8 @@ class ModelVariables {
     Variable density,
              pressure,
              velocity,
-             dxb,
-             dxc,
+             dxBound,
+             dxCell,
              energy;
 
     int save(const std::string& filePath) const;

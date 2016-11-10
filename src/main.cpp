@@ -19,8 +19,8 @@ real calcPressure(real energy, real gamma, real rho) {
   return energy*(gamma-1)*rho;
 }
 
-real calcSHalfDensityAt(int i, real* dxb, real* rho) {
-  return (dxb[i]*rho[i] + dxb[i+1]*rho[i+1])/(dxb[i] + dxb[i+1]);
+real calcSHalfDensityAt(int i, real* dxBound, real* rho) {
+  return (dxBound[i]*rho[i] + dxBound[i+1]*rho[i+1])/(dxBound[i] + dxBound[i+1]);
 }
 
 real mean(real a, real b) {
@@ -32,14 +32,14 @@ void runPredictorStep(ModelVariables& vars, const Constants& c) {
   Variable &u = vars.velocity;
   Variable &e = vars.energy;
   Variable &rho = vars.density;
-  Variable &dxb = vars.dxb;
+  Variable &dxBound = vars.dxBound;
   real* pHalf = p.get();
 
   for(int i=1; i<vars.len()-1; ++i) {
     real pressureCurrent = calcPressure(e[i], c.gamma, rho[i]);
-    real energyHalf = e[i] - c.dt/2.0f*pressureCurrent*(u[i] - u[i-1])/(rho[i]*dxb[i]);
-    real dxbHalf = dxb[i] + c.dt/2.0f*(u[i] - u[i-1]);
-    real rhoHalf = rho[i]*dxb[i]/dxbHalf;
+    real energyHalf = e[i] - c.dt/2.0f*pressureCurrent*(u[i] - u[i-1])/(rho[i]*dxBound[i]);
+    real dxBoundHalf = dxBound[i] + c.dt/2.0f*(u[i] - u[i-1]);
+    real rhoHalf = rho[i]*dxBound[i]/dxBoundHalf;
     pHalf[i] = calcPressure(energyHalf, c.gamma, rhoHalf);
   }
 }
@@ -52,32 +52,32 @@ void runCorrectorStep(ModelVariables& vars, const Constants& c) {
   real* eNew = e.getPlus(1);
   Variable &rho = vars.density;
   real* rhoNew = rho.getPlus(1);
-  Variable &dxb = vars.dxb;
-  real* dxbNew = dxb.getPlus(1);
-  Variable &dxc = vars.dxc;
-  real* dxcNew = dxc.getPlus(1);
+  Variable &dxBound = vars.dxBound;
+  real* dxBoundNew = dxBound.getPlus(1);
+  Variable &dxCell = vars.dxCell;
+  real* dxCellNew = dxCell.getPlus(1);
 
   real uHalf, uHalfPrev;
   for(int i=1; i<vars.len() - 1; ++i) {
     // Calc density at spatial half step
-    real rhoSHalf = calcSHalfDensityAt(i, dxb.get(), rho.get());
-    uNew[i] = u[i] - c.dt*(pHalf[i+1] - pHalf[i])/(rhoSHalf*dxc[i]);
+    real rhoSHalf = calcSHalfDensityAt(i, dxBound.get(), rho.get());
+    uNew[i] = u[i] - c.dt*(pHalf[i+1] - pHalf[i])/(rhoSHalf*dxCell[i]);
     uHalfPrev = uHalf;
     uHalf = mean(u[i], uNew[i]);
-    eNew[i] = e[i] - c.dt*pHalf[i]*(uHalf - uHalfPrev)/(rho[i]*dxb[i]);
-    dxbNew[i] = dxb[i] + c.dt*(uHalf - uHalfPrev);
-    dxcNew[i-1] = mean(dxbNew[i-1], dxbNew[i]);
-    rhoNew[i] = rho[i]*dxb[i]/dxbNew[i];
+    eNew[i] = e[i] - c.dt*pHalf[i]*(uHalf - uHalfPrev)/(rho[i]*dxBound[i]);
+    dxBoundNew[i] = dxBound[i] + c.dt*(uHalf - uHalfPrev);
+    dxCellNew[i-1] = mean(dxBoundNew[i-1], dxBoundNew[i]);
+    rhoNew[i] = rho[i]*dxBound[i]/dxBoundNew[i];
   }
 }
 
 void runRemapStep(ModelVariables& vars, const Constants& c) {
   Variable& rho = vars.density;
   real* rhoNew = vars.density.getPlus(1);
-  Variable& dxb = vars.dxb;
-  real* dxbNew = vars.dxb.getPlus(1);
-  Variable& dxc = vars.dxc;
-  real* dxcNew = vars.dxc.getPlus(1);
+  Variable& dxBound = vars.dxBound;
+  real* dxBoundNew = vars.dxBound.getPlus(1);
+  Variable& dxCell = vars.dxCell;
+  real* dxCellNew = vars.dxCell.getPlus(1);
   Variable& u = vars.velocity;
   real* uNew = vars.velocity.getPlus(1);
   Variable& e = vars.energy;
@@ -86,47 +86,47 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
   real dM, dMPrev, de, dePrev, du, duPrev;
   for(int i=2; i<vars.len()-2; ++i) {
     real uBar = mean(u[i], uNew[i]);
-    real phi = std::abs(uBar)*c.dt/dxbNew[i];
+    real phi = std::abs(uBar)*c.dt/dxBoundNew[i];
 
-    real D = FluxLimiter::calcAt(i, phi, rhoNew, uBar, dxcNew, dxbNew);
+    real D = FluxLimiter::calcAt(i, phi, rhoNew, uBar, dxCellNew, dxBoundNew);
     dMPrev = dM;
-    dM = (rhoNew[i] + dxbNew[i]/2.0f*D*(1-phi))*std::abs(uBar)*c.dt;
-    rhoNew[i] = rho[i] + (dMPrev - dM)/dxb[i];
+    dM = (rhoNew[i] + dxBoundNew[i]/2.0f*D*(1-phi))*std::abs(uBar)*c.dt;
+    rhoNew[i] = rho[i] + (dMPrev - dM)/dxBound[i];
 
-    real dedx = FluxLimiter::calcAt(i, phi, e.get(), uBar, dxc.get(), dxb.get());
+    real dedx = FluxLimiter::calcAt(i, phi, e.get(), uBar, dxCell.get(), dxBound.get());
     dePrev = de;
-    de = (eNew[i] + dxb[i]/2.0f*dedx*(1 - dM/(rho[i]*dxb[i])))*dM;
-    eNew[i] = (eNew[i]*dxb[i]*rho[i] + dePrev - de)/(dxb[i]*rhoNew[i]);
+    de = (eNew[i] + dxBound[i]/2.0f*dedx*(1 - dM/(rho[i]*dxBound[i])))*dM;
+    eNew[i] = (eNew[i]*dxBound[i]*rho[i] + dePrev - de)/(dxBound[i]*rhoNew[i]);
 
-    // NB: dudx calc'd over dxc, hence swap dxc & dxb
-    //real dudx = FluxLimiter::calcAt(i, phi, uNew, uBar, dxbNew, dxcNew);
+    // NB: dudx calc'd over dxCell, hence swap dxCell & dxBound
+    //real dudx = FluxLimiter::calcAt(i, phi, uNew, uBar, dxBoundNew, dxCellNew);
     //duPrev = du;
     //real uBarNext = mean(u[i+1], uNew[i+1]);
     //real uBarPrev = mean(u[i-1], uNew[i-1]);
-    //real delta = dxcNew[i]/2.0f - (uBar + uBarNext)/4.0f*c.dt;
+    //real delta = dxCellNew[i]/2.0f - (uBar + uBarNext)/4.0f*c.dt;
     //real uc = uNew[i] + delta*dudx;
     //du = uc*(uBarNext + uBar)/2.0f*c.dt;
-    ////du = (uNew[i] + (dxb[i]/2.0f - c.dt/4.0f*(uBarPrev + uBar))*dudx)*c.dt/2.0f*(uBarNext + uBar);
+    ////du = (uNew[i] + (dxBound[i]/2.0f - c.dt/4.0f*(uBarPrev + uBar))*dudx)*c.dt/2.0f*(uBarNext + uBar);
     ////printf("%f", du);
-    //uNew[i] = u[i] + (duPrev - du)/dxc[i];
+    //uNew[i] = u[i] + (duPrev - du)/dxCell[i];
 
-    // NB: dudx calc'd over dxc, hence swap dxc & dxb
-    real rhoSHalf = calcSHalfDensityAt(i-1, dxb.get(), rho.get());
-    real dudx = FluxLimiter::calcAt(i-1, phi, u.get(), uBar, dxb.get(), dxc.get());
+    // NB: dudx calc'd over dxCell, hence swap dxCell & dxBound
+    real rhoSHalf = calcSHalfDensityAt(i-1, dxBound.get(), rho.get());
+    real dudx = FluxLimiter::calcAt(i-1, phi, u.get(), uBar, dxBound.get(), dxCell.get());
     duPrev = du;
-    //du = (uNew[i] + dxc[i]/2.0f*dudx*(1 - dM/(rho[i]*dxc[i])))*dM;
-    du = (uNew[i-1] + dxc[i-1]/2.0f*dudx*(1 - mean(dM, dMPrev)/(rhoSHalf*dxc[i-1])))*mean(dM, dMPrev);
-    uNew[i-1] = (uNew[i-1]*dxc[i-1]*rhoSHalf + duPrev - du)/(dxc[i-1]*calcSHalfDensityAt(i-1, dxbNew, rhoNew));
+    //du = (uNew[i] + dxCell[i]/2.0f*dudx*(1 - dM/(rho[i]*dxCell[i])))*dM;
+    du = (uNew[i-1] + dxCell[i-1]/2.0f*dudx*(1 - mean(dM, dMPrev)/(rhoSHalf*dxCell[i-1])))*mean(dM, dMPrev);
+    uNew[i-1] = (uNew[i-1]*dxCell[i-1]*rhoSHalf + duPrev - du)/(dxCell[i-1]*calcSHalfDensityAt(i-1, dxBoundNew, rhoNew));
     
     //real phiHalf = std::abs()
     //real DHalf = FluxLimiter::calcAt(i, )
-    //real dMHalf = (calcSHalfDensityAt(i, dxb.get(), rhoNew) + dxcNew[i]/2.0f*)
+    //real dMHalf = (calcSHalfDensityAt(i, dxBound.get(), rhoNew) + dxCellNew[i]/2.0f*)
   }
 
   // Remap grid
   for(int i=0; i < vars.len(); ++i) {
-    dxbNew[i] = dxb[i];
-    dxcNew[i] = dxc[i];
+    dxBoundNew[i] = dxBound[i];
+    dxCellNew[i] = dxCell[i];
   }
 }
 
