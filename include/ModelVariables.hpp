@@ -14,10 +14,7 @@ class ModelVariables {
              velocity,
              dxb,
              dxc,
-             energy,
-             dM,
-             de,
-             du;
+             energy;
 
     int save(const std::string& filePath) const;
     int load(const std::string& filePath, const Constants& c);

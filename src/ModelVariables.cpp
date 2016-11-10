@@ -11,9 +11,6 @@ ModelVariables::ModelVariables(const Constants& c):
   dxb(c.nGridPoints, 2),
   dxc(c.nGridPoints, 2),
   energy(c.nGridPoints, 2),
-  dM(c.nGridPoints, 1),
-  de(c.nGridPoints, 1),
-  du(c.nGridPoints, 1),
   length(c.nGridPoints)
 {
   // Initialise grid and energy
@@ -29,9 +26,6 @@ ModelVariables::ModelVariables(const Constants& c):
   vars.push_back(&dxb);
   vars.push_back(&dxc);
   vars.push_back(&energy);
-  vars.push_back(&dM);
-  vars.push_back(&de);
-  vars.push_back(&du);
 
   IO.push_back(&density);
   IO.push_back(&pressure);
