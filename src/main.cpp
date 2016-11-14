@@ -11,12 +11,16 @@ void log(std::string str) {
   std::cout << str << std::endl;
 }
 
-real calcPressure(real energy, real gamma, real rho) {
-  //if(u[i] - u[i-1] < 0) {
-    //pNew[i] += c.sigma1*rho[i]*std::sqrt(c.gamma*pNew[i]/rho[i])*(u[i]-u[i-1])
-      //+ c.sigma2*rho[i]*std::pow(u[i]-u[i-1], 2);
-  //}
-  return energy*(gamma-1)*rho;
+real calcViscosityCoeff(real sigma1, real sigma2, real rho, real cs, real du) {
+  return (sigma1*cs + sigma2*std::abs(du))*rho*std::abs(du);
+}
+
+real calcPressureAt(int i, real energy, real gamma, real rho, real* u, const Constants& c) {
+  real pressure = energy*(gamma-1)*rho;
+  if(u[i] - u[i-1] < 0) {
+    pressure += calcViscosityCoeff(c.sigma1, c.sigma2, rho, std::sqrt(c.gamma*pressure/rho), u[i]-u[i-1]);
+  }
+  return pressure;
 }
 
 real calcSHalfDensityAt(int i, real* dxBound, real* rho) {
@@ -33,14 +37,18 @@ void runPredictorStep(ModelVariables& vars, const Constants& c) {
   Variable &e = vars.energy;
   Variable &rho = vars.density;
   Variable &dxBound = vars.dxBound;
+  Variable &dxCell = vars.dxCell;
   real* pHalf = p.get();
 
   for(int i=1; i<vars.len()-1; ++i) {
-    real pressureCurrent = calcPressure(e[i], c.gamma, rho[i]);
+    real pressureCurrent = calcPressureAt(i, e[i], c.gamma, rho[i], u.get(), c);
     real energyHalf = e[i] - c.dt/2.0f*pressureCurrent*(u[i] - u[i-1])/(rho[i]*dxBound[i]);
+    if(u[i] - u[i-1] < 0) {
+      //energyHalf -= calcViscosityCoeff(c.sigma1, c.sigma2, rho[i], std::sqrt(c.gamma*pressureCurrent/rho[i]), u[i]-u[i-1])*(u[i]-u[i-1])/(dxCell[i]*rho[i]);
+    }
     real dxBoundHalf = dxBound[i] + c.dt/2.0f*(u[i] - u[i-1]);
     real rhoHalf = rho[i]*dxBound[i]/dxBoundHalf;
-    pHalf[i] = calcPressure(energyHalf, c.gamma, rhoHalf);
+    pHalf[i] = calcPressureAt(i, energyHalf, c.gamma, rhoHalf, u.get(), c);
   }
 }
 
@@ -64,10 +72,15 @@ void runCorrectorStep(ModelVariables& vars, const Constants& c) {
     uNew[i] = u[i] - c.dt*(pHalf[i+1] - pHalf[i])/(rhoSHalf*dxCell[i]);
     uHalfPrev = uHalf;
     uHalf = mean(u[i], uNew[i]);
-    eNew[i] = e[i] - c.dt*pHalf[i]*(uHalf - uHalfPrev)/(rho[i]*dxBound[i]);
     dxBoundNew[i] = dxBound[i] + c.dt*(uHalf - uHalfPrev);
     dxCellNew[i-1] = mean(dxBoundNew[i-1], dxBoundNew[i]);
     rhoNew[i] = rho[i]*dxBound[i]/dxBoundNew[i];
+    eNew[i] = e[i] - c.dt*pHalf[i]*(uHalf - uHalfPrev)/(rho[i]*dxBound[i]);
+    if(uNew[i] - uNew[i-1] < 0) {
+      real pressureNew = calcPressureAt(i, eNew[i], c.gamma, rhoNew[i], u.get(), c);
+      // TODO
+      //eNew[i] -= calcViscosityCoeff(c.sigma1, c.sigma2, rhoNew[i], std::sqrt(c.gamma*pressureNew/rhoNew[i]), uNew[i]-uNew[i-1])*(uNew[i]-uNew[i-1])/(dxCellNew[i]*rhoNew[i]);
+    }
   }
 }
 
