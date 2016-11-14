@@ -17,7 +17,8 @@ real FluxLimiter::calcAt(int i, real phi, real* f, real uBar, real* dxCell, real
   real s = calcSignAt(i, f);
 
   //return s*absD;
-  return s*min(absD*dxBound[i], dfMin);
+  return s*min(absD*dxBound[i], dfMin)/dxBound[i];
+  //return s*min(absD*dxBound[i], dfMin);
 }
 
 int FluxLimiter::calcSignAt(int i, real* f) {
