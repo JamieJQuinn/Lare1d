@@ -3,5 +3,5 @@
 cd data/RiemannData
 rm *.dat
 ../../lare1d
-../../analysis/plot.py -c show -N 300 --over=analyticalSoln324.dat  RiemannSoln324.dat
+../../analysis/plot.py -c show -N 800 --over=analyticalSoln.dat  RiemannSoln.dat
 cd ../..
