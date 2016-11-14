@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
@@ -14,13 +13,18 @@ def loadVariables(filename, N):
     return pressure, density, velocity
 
 
-def plotVariables(axes, pressure, density, velocity, N):
+def plotVariables(axes, pressure, density, velocity, N, numerical=False):
     x = np.linspace(0, 1, num=N)
-    axes[0].plot(x, pressure)
+    if numerical:
+        linestyle = 'x'
+    else:
+        linestyle = ''
+
+    axes[0].plot(x, pressure, linestyle)
     axes[0].set_ylabel("Pressure")
-    axes[1].plot(x, density)
+    axes[1].plot(x, density, linestyle)
     axes[1].set_ylabel("Density")
-    axes[2].plot(x, velocity)
+    axes[2].plot(x, velocity, linestyle)
     axes[2].set_ylabel("Velocity")
 
 
