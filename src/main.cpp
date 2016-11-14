@@ -11,15 +11,13 @@ void log(std::string str) {
   std::cout << str << std::endl;
 }
 
-real calcViscosityCoeff(real sigma1, real sigma2, real rho, real cs, real du) {
-  return (sigma1*cs + sigma2*std::abs(du))*rho*std::abs(du);
+real calcHeatingCoeff(real sigma1, real sigma2, real rho, real cs, real du) {
+  return (sigma1*cs + sigma2*std::abs(du))*rho*std::abs(du)*int(du<0);
 }
 
-real calcPressureAt(int i, real energy, real gamma, real rho, real* u, const Constants& c) {
+real calcPressure(real energy, real gamma, real rho, real du, const Constants& c) {
   real pressure = energy*(gamma-1)*rho;
-  if(u[i] - u[i-1] < 0) {
-    pressure += calcViscosityCoeff(c.sigma1, c.sigma2, rho, std::sqrt(c.gamma*pressure/rho), u[i]-u[i-1]);
-  }
+  pressure += calcHeatingCoeff(c.sigma1, c.sigma2, rho, std::sqrt(c.gamma*pressure/rho), du);
   return pressure;
 }
 
@@ -37,18 +35,14 @@ void runPredictorStep(ModelVariables& vars, const Constants& c) {
   Variable &e = vars.energy;
   Variable &rho = vars.density;
   Variable &dxBound = vars.dxBound;
-  Variable &dxCell = vars.dxCell;
   real* pHalf = p.get();
 
   for(int i=1; i<vars.len()-1; ++i) {
-    real pressureCurrent = calcPressureAt(i, e[i], c.gamma, rho[i], u.get(), c);
+    real pressureCurrent = calcPressure(e[i], c.gamma, rho[i], u[i]-u[i-1], c);
     real energyHalf = e[i] - c.dt/2.0f*pressureCurrent*(u[i] - u[i-1])/(rho[i]*dxBound[i]);
-    if(u[i] - u[i-1] < 0) {
-      //energyHalf -= calcViscosityCoeff(c.sigma1, c.sigma2, rho[i], std::sqrt(c.gamma*pressureCurrent/rho[i]), u[i]-u[i-1])*(u[i]-u[i-1])/(dxCell[i]*rho[i]);
-    }
     real dxBoundHalf = dxBound[i] + c.dt/2.0f*(u[i] - u[i-1]);
     real rhoHalf = rho[i]*dxBound[i]/dxBoundHalf;
-    pHalf[i] = calcPressureAt(i, energyHalf, c.gamma, rhoHalf, u.get(), c);
+    pHalf[i] = calcPressure(energyHalf, c.gamma, rhoHalf, u[i]-u[i-1], c);
   }
 }
 
@@ -76,11 +70,6 @@ void runCorrectorStep(ModelVariables& vars, const Constants& c) {
     dxCellNew[i-1] = mean(dxBoundNew[i-1], dxBoundNew[i]);
     rhoNew[i] = rho[i]*dxBound[i]/dxBoundNew[i];
     eNew[i] = e[i] - c.dt*pHalf[i]*(uHalf - uHalfPrev)/(rho[i]*dxBound[i]);
-    if(uNew[i] - uNew[i-1] < 0) {
-      real pressureNew = calcPressureAt(i, eNew[i], c.gamma, rhoNew[i], u.get(), c);
-      // TODO
-      //eNew[i] -= calcViscosityCoeff(c.sigma1, c.sigma2, rhoNew[i], std::sqrt(c.gamma*pressureNew/rhoNew[i]), uNew[i]-uNew[i-1])*(uNew[i]-uNew[i-1])/(dxCellNew[i]*rhoNew[i]);
-    }
   }
 }
 
@@ -130,31 +119,28 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
 }
 
 void simulateRiemannProblem() {
-  const Constants c(
-      0.0001f,
-      2.0f,
-      300,
-      324,
-      2.0f,
-      3.0f
-  );
+  real totalTime = 0.0324;
+  real dt = 5e-6;
+  real gamma = 2.0f;
+  real nGridPoints = 800;
+  real nTimeSteps = int(totalTime/dt);
+  real sigma1 = 2.0f;
+  real sigma2 = 3.0f;
+  const Constants c(dt, gamma, nGridPoints, nTimeSteps, sigma1, sigma2);
   ModelVariables vars(c);
 
   setupAnalyticalSolution(vars, c);
-  vars.save("analyticalSoln"+std::to_string(c.nTimeSteps)+".dat");
+  vars.save("analyticalSoln.dat");
 
   setupInitialConditions(vars, c);
   for(int n=0; n<=c.nTimeSteps; ++n) {
-    vars.save("RiemannSoln"+std::to_string(n)+".dat");
-    //vars.pressure.print();
-    //vars.density.print();
-    //vars.velocity.print();
-    //vars.energy.print();
+    //vars.save("RiemannSoln"+std::to_string(n)+".dat");
     runPredictorStep(vars, c);
     runCorrectorStep(vars, c);
     runRemapStep(vars, c);
     vars.nextTimestep();
   }
+  vars.save("RiemannSoln.dat");
 }
 
 int main(int argc, char** argv) {
