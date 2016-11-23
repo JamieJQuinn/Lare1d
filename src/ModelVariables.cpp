@@ -27,8 +27,8 @@ ModelVariables::ModelVariables(const Constants& c):
   vars.push_back(&dxCell);
   vars.push_back(&energy);
 
-  IO.push_back(&density);
   IO.push_back(&pressure);
+  IO.push_back(&density);
   IO.push_back(&velocity);
 }
 
