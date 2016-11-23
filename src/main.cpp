@@ -7,6 +7,10 @@
 #include <iostream>
 #include <cmath>
 #include <assert.h>
+#include <json.hpp>
+#include <unistd.h> 
+
+using namespace std;
 
 void log(std::string str) {
   std::cout << str << std::endl;
@@ -169,9 +173,39 @@ void simulateSodProblem() {
   vars.save("SodSoln.dat");
 }
 
+void simulate(ModelVariables vars, const Constants c) {
+  for(int n=0; n<=c.nTimeSteps; ++n) {
+    vars.save("num"+to_string(n)+".dat");
+    runPredictorStep(vars, c);
+    runCorrectorStep(vars, c);
+    runRemapStep(vars, c);
+    vars.nextTimestep();
+  }
+}
+
 int main(int argc, char** argv) {
-  //simulateRiemannProblem();
-  simulateSodProblem();
+  // parse args
+  string optionsStr = "c:i:";
+  string constantsFilePath;
+  string ICFilePath;
+
+  int opt;
+  while( (opt = getopt(argc, argv, optionsStr.c_str())) != -1) {
+    switch(opt) {
+      case 'c':
+        constantsFilePath = optarg;
+        break;
+      case 'i':
+        ICFilePath = optarg;
+    }
+  }
+
+  Constants c;
+  c.readJson(constantsFilePath);
+  ModelVariables vars(c);
+  vars.load(ICFilePath, c);
+
+  simulate(vars, c);
 
   return 0;
 }

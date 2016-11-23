@@ -1,29 +1,32 @@
 CC=g++
-CFLAGS=-c -Wall -std=c++11 -I$(INCLUDE_DIR) -g
+CFLAGS=-c -Wall -std=c++11 -I$(INCLUDE_DIR) -I$(LIB_INCLUDE_DIR) -g
 LDFLAGS=
 SRC_DIR=src
-SOURCES=$(wildcard $(SRC_DIR)/*.cpp)
-OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=lare1d
 BUILD_DIR=build
 INCLUDE_DIR=include
+LIB_INCLUDE_DIR=lib/include
 
-TEST_DIR=test
+SOURCES=$(wildcard $(SRC_DIR)/*.cpp)
+OBJECTS=$(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SOURCES))
+EXECUTABLE=$(BUILD_DIR)/lare1d
+
+TEST_DIR=test/unit_tests
 TEST_SOURCES=$(wildcard $(TEST_DIR)/*.cpp)
-TEST_EXECUTABLE=test_$(EXECUTABLE)
+TEST_EXECUTABLE=test
 
 all: $(SOURCES) $(EXECUTABLE)
 	    
-$(EXECUTABLE): $(OBJECTS) 
+$(EXECUTABLE): $(OBJECTS) $(BUILD_DIR)
 	    $(CC) $(LDFLAGS) $(OBJECTS) -o $@
-			mkdir -p $(BUILD_DIR)
-			mv $(SRC_DIR)/*.o $(BUILD_DIR)
 
-.cpp.o:
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(BUILD_DIR)
 	    $(CC) $(CFLAGS) $< -o $@
 
+$(BUILD_DIR):
+			mkdir -p $@
+
 clean:
-			rm -rf $(BUILD_DIR) $(EXECUTABLE) $(TEST_DIR)/$(TEST_EXECUTABLE)
+			rm -rf $(BUILD_DIR) $(TEST_DIR)/$(TEST_EXECUTABLE)
 
 test: $(TEST_DIR)/$(TEST_EXECUTABLE)
 			cd $(TEST_DIR); ./$(TEST_EXECUTABLE)
