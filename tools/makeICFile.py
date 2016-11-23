@@ -36,7 +36,7 @@ def main():
                        choices=['sod', 'riemann'])
     parser.add_argument('-N', help='Number of grid points',
                         type=int, required=True)
-    parser.add_argument('-o', help='Output file', required=True)
+    parser.add_argument('-o', help='Output file', default="initial_conditions.dat")
     args = parser.parse_args()
 
     x = np.linspace(0, 1, num=args.N)
