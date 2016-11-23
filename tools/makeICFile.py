@@ -49,7 +49,6 @@ def main():
     elif args.problem == 'sod':
         setICsSod(x, pressure, density, velocity)
 
-
     with open(args.o, 'wb') as fp:
         pressure.tofile(fp)
         density.tofile(fp)
