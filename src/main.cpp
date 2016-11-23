@@ -121,9 +121,9 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
   }
 }
 
-void simulate(ModelVariables vars, const Constants c) {
+void simulate(ModelVariables& vars, const Constants& c) {
   for(int n=0; n<=c.nTimeSteps; ++n) {
-    vars.save("num"+to_string(n)+".dat");
+    vars.save(to_string(n)+".dat");
     runPredictorStep(vars, c);
     runCorrectorStep(vars, c);
     runRemapStep(vars, c);
