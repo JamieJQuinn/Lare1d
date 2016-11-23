@@ -6,8 +6,8 @@ import argparse
 
 def loadVariables(filename, N):
     var = np.fromfile(filename, dtype=np.dtype(np.double))
-    density = var[:N]
-    pressure = var[N:2*N]
+    pressure = var[:N]
+    density = var[N:2*N]
     velocity = var[2*N:]
 
     return pressure, density, velocity
