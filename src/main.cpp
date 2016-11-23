@@ -122,11 +122,12 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
 }
 
 void simulate(ModelVariables& vars, const Constants& c) {
-  for(int n=0; n<=c.nTimeSteps; ++n) {
-    vars.save(to_string(n)+".dat");
+  vars.save("numerical0.dat");
+  for(int n=0; n<c.nTimeSteps; ++n) {
     runPredictorStep(vars, c);
     runCorrectorStep(vars, c);
     runRemapStep(vars, c);
+    vars.save("numerical"+to_string(n+1)+".dat");
     vars.nextTimestep();
   }
 }
