@@ -185,9 +185,11 @@ void simulate(ModelVariables vars, const Constants c) {
 
 int main(int argc, char** argv) {
   // parse args
-  string optionsStr = "c:i:";
-  string constantsFilePath;
-  string ICFilePath;
+  string optionsStr = "ci";
+
+  // Default location is current dir
+  string constantsFilePath = "constants.json";
+  string ICFilePath = "initial_conditions.dat";
 
   int opt;
   while( (opt = getopt(argc, argv, optionsStr.c_str())) != -1) {
@@ -197,9 +199,11 @@ int main(int argc, char** argv) {
         break;
       case 'i':
         ICFilePath = optarg;
+        break;
     }
   }
 
+  // Load constants & initial conditions
   Constants c;
   c.readJson(constantsFilePath);
   ModelVariables vars(c);
