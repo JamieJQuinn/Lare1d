@@ -1,8 +1,6 @@
 #include <ModelVariables.hpp>
 #include <Constants.hpp>
 #include <Variable.hpp>
-#include <RiemannProblem.hpp>
-#include <SodProblem.hpp>
 #include <FluxLimiter.hpp>
 #include <iostream>
 #include <cmath>
@@ -121,56 +119,6 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
     dxBoundNew[i] = dxBound[i];
     dxCellNew[i] = dxCell[i];
   }
-}
-
-void simulateRiemannProblem() {
-  real totalTime = 0.0324;
-  real dt = 5e-6;
-  real gamma = 2.0f;
-  real nGridPoints = 800;
-  real nTimeSteps = int(totalTime/dt);
-  real sigma1 = 2.0f;
-  real sigma2 = 3.0f;
-  const Constants c(dt, gamma, nGridPoints, nTimeSteps, sigma1, sigma2);
-  ModelVariables vars(c);
-
-  RiemannProblem::setupAnalyticalSolution(vars, c);
-  vars.save("analyticalSoln.dat");
-
-  RiemannProblem::setupInitialConditions(vars, c);
-  for(int n=0; n<=c.nTimeSteps; ++n) {
-    //vars.save("RiemannSoln"+std::to_string(n)+".dat");
-    runPredictorStep(vars, c);
-    runCorrectorStep(vars, c);
-    runRemapStep(vars, c);
-    vars.nextTimestep();
-  }
-  vars.save("RiemannSoln.dat");
-}
-
-void simulateSodProblem() {
-  real totalTime = 0.14154;
-  real dt = 1e-5;
-  real gamma = 1.4f;
-  real nGridPoints = 500;
-  real nTimeSteps = int(totalTime/dt);
-  real sigma1 = 2.0f;
-  real sigma2 = 3.0f;
-  const Constants c(dt, gamma, nGridPoints, nTimeSteps, sigma1, sigma2);
-  ModelVariables vars(c);
-
-  //SodProblem::setupAnalyticalSolution(vars, c);
-  //vars.save("analyticalSoln.dat");
-
-  SodProblem::setupInitialConditions(vars, c);
-  for(int n=0; n<=c.nTimeSteps; ++n) {
-    //vars.save("RiemannSoln"+std::to_string(n)+".dat");
-    runPredictorStep(vars, c);
-    runCorrectorStep(vars, c);
-    runRemapStep(vars, c);
-    vars.nextTimestep();
-  }
-  vars.save("SodSoln.dat");
 }
 
 void simulate(ModelVariables vars, const Constants c) {
