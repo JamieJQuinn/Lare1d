@@ -33,13 +33,13 @@ def main():
         description='Plotter script for 1D fluids'
     )
     parser.add_argument('filenames', help='Input file name', nargs='+')
-    parser.add_argument('--over', help='Data file to plot over')
     parser.add_argument('-N', help='Number of grid points',
                         type=int, required=True)
     parser.add_argument('-c', '--command', metavar='command',
                         choices=['show', 'save'],
                         help='Plotting command to run',
                         required=True)
+    parser.add_argument('--over', help='Data file to plot over')
     args = parser.parse_args()
 
     for filename in args.filenames:
