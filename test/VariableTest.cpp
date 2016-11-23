@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch.hpp>
 #include <Variable.hpp>
 
 TEST_CASE( "Variables initialize correctly", "[variables]") {

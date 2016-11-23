@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch.hpp>
 #include <ModelVariables.hpp>
 #include <Constants.hpp>
 #include <iostream>
