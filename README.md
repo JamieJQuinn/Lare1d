@@ -25,3 +25,8 @@ The sample simulations so far are
 * Riemann Problem
 
 This can be run by running the `run_example.sh` script in the `example` folder using `sh run_example.sh`.
+
+## Lagrangian-Remap Scheme
+The lare scheme is a useful one for simulating fluid systems where shocks resolution is required. This is specfically useful in the solar corona, where shocks play a large part in the physics. 
+
+The basic idea is to numerically solve the equations on a grid in Lagrangian form (rather than Eulerian form), distorting the grid. The variables are then remapped back onto the original grid using a geometrical argument. 
