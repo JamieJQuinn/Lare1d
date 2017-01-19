@@ -15,16 +15,20 @@ void log(std::string str) {
 }
 
 real calcHeatingCoeff(real sigma1, real sigma2, real rho, real cs, real du) {
+  // Calculates heating from artificial shock viscosity
   return (sigma1*cs + sigma2*std::abs(du))*rho*std::abs(du)*int(du<0);
 }
 
 real calcPressure(real energy, real gamma, real rho, real du, const Constants& c) {
+  // Actual pressure
   real pressure = energy*(gamma-1)*rho;
+  // Shock viscosity
   pressure += calcHeatingCoeff(c.sigma1, c.sigma2, rho, std::sqrt(c.gamma*pressure/rho), du);
   return pressure;
 }
 
 real calcSHalfDensityAt(int i, real* dxBound, real* rho) {
+  // interpolate density from i & i+1 to i+1/2 conserving mass
   return (dxBound[i]*rho[i] + dxBound[i+1]*rho[i+1])/(dxBound[i] + dxBound[i+1]);
 }
 
@@ -64,7 +68,7 @@ void runCorrectorStep(ModelVariables& vars, const Constants& c) {
 
   real uHalf, uHalfPrev;
   for(int i=1; i<vars.len() - 1; ++i) {
-    // Calc density at spatial half step
+    // interpolate density between grid points for u calculation
     real rhoSHalf = calcSHalfDensityAt(i, dxBound.get(), rho.get());
     uNew[i] = u[i] - c.dt*(pHalf[i+1] - pHalf[i])/(rhoSHalf*dxCell[i]);
     uHalfPrev = uHalf;
@@ -95,23 +99,26 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
     real uBarPrevSHalf = mean(uBar, mean(u[i-1], uNew[i-1]));
     real phiPrevSHalf = std::abs(uBarPrevSHalf)*c.dt/dxCellNew[i-1];
 
+    // Remap density
     dMPrev = dM;
     real D = FluxLimiter::calcAt(i, phi, rhoNew, uBar, dxCellNew, dxBoundNew);
     dM = (rhoNew[i] + dxBoundNew[i]/2.0f*D*(1-phi))*std::abs(uBar)*c.dt;
     rhoNew[i] = rho[i] + (dMPrev - dM)/dxBound[i];
 
+    // Remap energy
     dePrev = de;
     real dedx = FluxLimiter::calcAt(i, phi, e.get(), uBar, dxCell.get(), dxBound.get());
     de = (eNew[i] + dxBound[i]/2.0f*dedx*(1 - dM/(rho[i]*dxBound[i])))*dM;
     eNew[i] = (eNew[i]*dxBound[i]*rho[i] + dePrev - de)/(dxBound[i]*rhoNew[i]);
 
+    // Remap velocity  
+    // u calc'd at i-1 because it relies on ith calculation of rho
     duPrev = du;
     real rhoSHalf = calcSHalfDensityAt(i-1, dxBound.get(), rho.get());
-    real dudx = FluxLimiter::calcAt(i-1, phiPrevSHalf, u.get(), uBarPrevSHalf, dxBound.get(), dxCell.get());
+    real dudx = FluxLimiter::calcAt(i-1, phiPrevSHalf, u.get(), uBarPrevSHalf, dxBoundNew, dxCellNew;
     real dMHalf = mean(dM, dMPrev);
     du = (uNew[i-1] + dxCell[i-1]/2.0f*dudx*(1 - dMHalf/(rhoSHalf*dxCell[i-1])))*dMHalf;
     uNew[i-1] = (uNew[i-1]*dxCell[i-1]*rhoSHalf + duPrev - du)/(dxCell[i-1]*calcSHalfDensityAt(i-1, dxBoundNew, rhoNew));
-    
   }
 
   // Remap grid
