@@ -115,7 +115,7 @@ void runRemapStep(ModelVariables& vars, const Constants& c) {
     // u calc'd at i-1 because it relies on ith calculation of rho
     duPrev = du;
     real rhoSHalf = calcSHalfDensityAt(i-1, dxBound.get(), rho.get());
-    real dudx = FluxLimiter::calcAt(i-1, phiPrevSHalf, u.get(), uBarPrevSHalf, dxBoundNew, dxCellNew;
+    real dudx = FluxLimiter::calcAt(i-1, phiPrevSHalf, u.get(), uBarPrevSHalf, dxBoundNew, dxCellNew);
     real dMHalf = mean(dM, dMPrev);
     du = (uNew[i-1] + dxCell[i-1]/2.0f*dudx*(1 - dMHalf/(rhoSHalf*dxCell[i-1])))*dMHalf;
     uNew[i-1] = (uNew[i-1]*dxCell[i-1]*rhoSHalf + duPrev - du)/(dxCell[i-1]*calcSHalfDensityAt(i-1, dxBoundNew, rhoNew));

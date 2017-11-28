@@ -44,7 +44,7 @@ def main():
 
     for filename in args.filenames:
         print("Plotting " + filename)
-        f, axes = plt.subplots(1, 3, sharex=True)
+        f, axes = plt.subplots(3, 1, sharex=True)
         pressure, density, velocity = loadVariables(filename, args.N)
         plotVariables(axes, pressure, density, velocity, args.N)
         if(args.over):
