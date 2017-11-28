@@ -16,12 +16,12 @@ TEST_OBJECTS=$(patsubst $(TEST_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(TEST_SOURCES))
 TEST_EXECUTABLE=lare1d_test
 
 all: $(BUILD_DIR) $(BUILD_DIR)/$(EXECUTABLE)
-	    
+
 $(BUILD_DIR)/$(EXECUTABLE): $(OBJECTS)
-	    $(CC) $(LDFLAGS) $(OBJECTS) -o $@
+			$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	    $(CC) $(CFLAGS) $< -o $@
+			$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR):
 			mkdir -p $@
@@ -35,8 +35,7 @@ test: all $(BUILD_DIR)/$(TEST_EXECUTABLE)
 			cd $(BUILD_DIR); ./$(TEST_EXECUTABLE)
 
 $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
-	    $(CC) $(CFLAGS) $< -o $@
+			$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/$(TEST_EXECUTABLE): $(TEST_OBJECTS)
-	    $(CC) $(LDFLAGS) $(filter-out $(BUILD_DIR)/main.o, $(OBJECTS)) $(TEST_OBJECTS) -o $@
-			
+			$(CC) $(LDFLAGS) $(filter-out $(BUILD_DIR)/main.o, $(OBJECTS)) $(TEST_OBJECTS) -o $@
